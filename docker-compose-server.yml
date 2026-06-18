@@ -1,7 +1,7 @@
 services:
   app:
     build: .
-    container_name: itlabbd-app
+    container_name: codexman-app
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -13,7 +13,7 @@ services:
     environment:
       NODE_ENV: production
 
-      DATABASE_URL: postgresql://itlabbd:StrongPassword123@postgres:5432/itlabbd?schema=public
+      DATABASE_URL: postgresql://codexman:StrongPassword123@postgres:5432/codexman?schema=public
       REDIS_URL: redis://redis:6379
 
       ADMIN_USERNAME: admin
@@ -26,12 +26,12 @@ services:
 
   postgres:
     image: postgres:16
-    container_name: itlabbd-postgres
+    container_name: codexman-postgres
     restart: unless-stopped
 
     environment:
-      POSTGRES_DB: itlabbd
-      POSTGRES_USER: itlabbd
+      POSTGRES_DB: codexman
+      POSTGRES_USER: codexman
       POSTGRES_PASSWORD: StrongPassword123
 
     volumes:
@@ -39,7 +39,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: itlabbd-redis
+    container_name: codexman-redis
     restart: unless-stopped
 
     volumes:
