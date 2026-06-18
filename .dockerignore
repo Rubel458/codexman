@@ -1,0 +1,8 @@
+node_modules
+.next
+.env
+.env.*
+*.log
+*.tsbuildinfo
+storage/backups
+public/uploads

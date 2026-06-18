@@ -1,0 +1,11 @@
+node_modules
+.next
+.env
+.env.local
+*.log
+public/uploads/*
+!public/uploads/.gitkeep
+storage/backups/*.dump
+storage/backups/*.sql
+
+*.tsbuildinfo

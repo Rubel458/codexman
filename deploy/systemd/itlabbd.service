@@ -1,0 +1,26 @@
+[Unit]
+Description=IT Lab BD Next.js CMS
+After=network-online.target docker.service
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/itlabbd
+Environment=NODE_ENV=production
+EnvironmentFile=/var/www/itlabbd/.env
+ExecStartPre=/usr/bin/npm run prod:check
+ExecStartPre=/usr/bin/bash -lc 'for i in {1..30}; do (echo > /dev/tcp/127.0.0.1/5432) >/dev/null 2>&1 && exit 0; sleep 2; done; exit 1'
+ExecStart=/usr/bin/npm run start -- -H 127.0.0.1 -p 3000
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/var/lib/itlabbd/uploads /var/lib/itlabbd/backups
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+# Install with: sudo cp deploy/cron/itlabbd-backups.cron /etc/cron.d/itlabbd-backups
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+# Daily snapshot at 03:00, keep last 7.
+0 3 * * * www-data cd /var/www/itlabbd && /usr/bin/npm run backup:daily >> /var/log/itlabbd-backup.log 2>&1
+# Weekly snapshot every Sunday at 03:20, keep last 4.
+20 3 * * 0 www-data cd /var/www/itlabbd && /usr/bin/npm run backup:weekly >> /var/log/itlabbd-backup.log 2>&1
+# Monthly snapshot on the first day at 03:40, keep last 3.
+40 3 1 * * www-data cd /var/www/itlabbd && /usr/bin/npm run backup:monthly >> /var/log/itlabbd-backup.log 2>&1

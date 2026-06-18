@@ -1,0 +1,323 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+  SPAM
+}
+
+enum BackupType {
+  MANUAL
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+enum BackupStatus {
+  READY
+  FAILED
+}
+
+enum SectionType {
+  HERO
+  ABOUT
+  COUNTERS
+  SERVICES
+  PLATFORMS
+  WHAT_WE_DO
+  PORTFOLIO
+  TESTIMONIALS
+  TRUSTED_COMPANIES
+  CONTACT
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  name         String?  
+  email        String?
+  active       Boolean  @default(true)
+  sessionVersion      Int       @default(0)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  resetTokens    PasswordResetToken[]
+  activityLogs   ActivityLog[]
+  databaseBackups DatabaseBackup[]
+}
+
+
+
+model TeamMember {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  name       String
+  role       String
+  bio        String?
+  imageUrl   String
+  skills     Json?
+  experience String?
+  email      String?
+  published  Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  group       String   @default("general")
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+}
+
+model Menu {
+  id        String   @id @default(cuid())
+  label     String
+  href      String
+  parentId  String?
+  sortOrder Int      @default(0)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String?
+  content     Json
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model HomepageSection {
+  id        String      @id @default(cuid())
+  type      SectionType @unique
+  title     String
+  enabled   Boolean     @default(true)
+  sortOrder Int         @default(0)
+  content   Json
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     Json?
+  icon        String?
+  sortOrder   Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PortfolioCategory {
+  id        String      @id @default(cuid())
+  name      String
+  slug      String      @unique
+  projects  Portfolio[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Portfolio {
+  id           String            @id @default(cuid())
+  slug         String            @unique
+  title        String
+  excerpt      String?
+  imageUrl     String
+  screenshots  Json?
+  technologies Json?
+  liveUrl      String?
+  buttonLabel  String?
+  buttonUrl    String?
+  caseStudy    Json?
+  published    Boolean           @default(true)
+  sortOrder    Int               @default(0)
+  categoryId   String?
+  category     PortfolioCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model DemoCategory {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  demos     Demo[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Demo {
+  id         String        @id @default(cuid())
+  slug       String        @unique
+  title      String
+  imageUrl   String
+  previewUrl String?
+  liveUrl    String?
+  published  Boolean       @default(true)
+  sortOrder  Int           @default(0)
+  categoryId String?
+  category   DemoCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model Testimonial {
+  id             String   @id @default(cuid())
+  brand          String
+  brandImageUrl  String?
+  quote          String
+  author         String
+  position       String?
+  clientImageUrl String?
+  rating         Int      @default(5)
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CompanyLogo {
+  id        String   @id @default(cuid())
+  name      String
+  imageUrl  String?
+  website   String?
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactLead {
+  id        String     @id @default(cuid())
+  name      String?
+  company   String?
+  phone     String?
+  email     String?
+  message   String
+  status    LeadStatus @default(NEW)
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  url          String
+  originalUrl  String?
+  optimizedUrl String?
+  mimeType     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  altText      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  action     String
+  resource   String?
+  resourceId String?
+  username   String?
+  details    Json?
+  ipHash     String?
+  userAgent  String?
+  adminId    String?
+  admin      Admin?   @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([action, createdAt])
+  @@index([resource, createdAt])
+}
+
+model DatabaseBackup {
+  id               String       @id @default(cuid())
+  filename         String       @unique
+  type             BackupType   @default(MANUAL)
+  status           BackupStatus @default(READY)
+  sizeBytes        Int          @default(0)
+  note             String?
+  createdByAdminId String?
+  createdByAdmin   Admin?       @relation(fields: [createdByAdminId], references: [id], onDelete: SetNull)
+  createdAt        DateTime     @default(now())
+
+  @@index([type, createdAt])
+  @@index([createdAt])
+}
+
+model VisitorDaily {
+  id          String   @id @default(cuid())
+  dateKey     String
+  visitorHash String
+  pageViews   Int      @default(1)
+  firstPath   String?
+  lastPath    String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([dateKey, visitorHash])
+  @@index([dateKey])
+  @@index([createdAt])
+}
+
+model SEOSettings {
+  id          String   @id @default(cuid())
+  route       String   @unique
+  title       String
+  description String
+  keywords    String?
+  ogImage     String?
+  noIndex     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   @default("INFO")
+  title     String
+  message   String
+  href      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([read, createdAt])
+}

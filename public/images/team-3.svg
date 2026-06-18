@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="720" viewBox="0 0 640 720" role="img" aria-label="Demo team member avatar">
+  <defs><linearGradient id="g3" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#7c3aed"/><stop offset=".5" stop-color="#ec4899"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
+  <rect width="640" height="720" rx="48" fill="#f8fafc"/>
+  <circle cx="320" cy="260" r="132" fill="url(#g3)" opacity=".22"/>
+  <circle cx="320" cy="238" r="92" fill="url(#g3)"/>
+  <path d="M118 680c18-158 97-238 202-238s184 80 202 238" fill="url(#g3)"/>
+  <circle cx="290" cy="226" r="9" fill="#fff" opacity=".85"/><circle cx="350" cy="226" r="9" fill="#fff" opacity=".85"/>
+  <path d="M282 276c28 26 48 26 76 0" fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round" opacity=".85"/>
+</svg>

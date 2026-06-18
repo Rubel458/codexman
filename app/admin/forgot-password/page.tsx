@@ -1,0 +1,3 @@
+import Link from "next/link"
+import { ForgotForm } from "@/components/admin/forgot-form"
+export default function ForgotPage(){return <main className="grid min-h-screen place-items-center bg-slate-100 p-5"><section className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl"><h1 className="font-heading text-2xl font-bold">Forgot password</h1><p className="mt-2 text-sm text-muted-foreground">Enter the administrator email address. A secure reset link will be sent by email when SMTP is configured.</p><div className="mt-6"><ForgotForm /></div><Link href="/admin/login" className="mt-6 block text-center text-sm font-semibold text-blue-700">Back to login</Link></section></main>}
