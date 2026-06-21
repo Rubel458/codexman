@@ -5,4 +5,6 @@ node_modules
 *.log
 *.tsbuildinfo
 storage/backups
+storage/uploads
+storage/downloads
 public/uploads

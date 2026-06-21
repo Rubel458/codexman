@@ -73,6 +73,8 @@ model TeamMember {
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([published, sortOrder])
 }
 
 model PasswordResetToken {
@@ -92,6 +94,8 @@ model Settings {
   group       String   @default("general")
   updatedAt   DateTime @updatedAt
   createdAt   DateTime @default(now())
+
+  @@index([group, key])
 }
 
 model Menu {
@@ -103,6 +107,9 @@ model Menu {
   enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([enabled, sortOrder])
+  @@index([parentId])
 }
 
 model Page {
@@ -114,6 +121,8 @@ model Page {
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([published, title])
 }
 
 model HomepageSection {
@@ -125,6 +134,8 @@ model HomepageSection {
   content   Json
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+  @@index([enabled, sortOrder])
 }
 
 model Service {
@@ -138,6 +149,8 @@ model Service {
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([published, sortOrder])
 }
 
 model PortfolioCategory {
@@ -167,6 +180,9 @@ model Portfolio {
   category     PortfolioCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([categoryId])
 }
 
 model DemoCategory {
@@ -191,6 +207,9 @@ model Demo {
   category   DemoCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([categoryId])
 }
 
 model Testimonial {
@@ -206,6 +225,8 @@ model Testimonial {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([published, sortOrder])
 }
 
 model CompanyLogo {
@@ -217,6 +238,8 @@ model CompanyLogo {
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([published, sortOrder])
 }
 
 model ContactLead {
@@ -246,6 +269,8 @@ model Media {
   altText      String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  @@index([createdAt])
 }
 
 model ActivityLog {
@@ -320,4 +345,93 @@ model Notification {
   updatedAt DateTime @updatedAt
 
   @@index([read, createdAt])
+}
+
+model DownloadCategory {
+  id        String         @id @default(cuid())
+  name      String
+  slug      String         @unique
+  items     DownloadItem[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model DownloadItem {
+  id               String            @id @default(cuid())
+  slug             String            @unique
+  title            String
+  description      String?
+  additionalInfo   String?
+  thumbnailUrl     String?
+  fileName         String
+  originalFilename String?
+  fileMimeType     String            @default("application/octet-stream")
+  fileSizeBytes    Int               @default(0)
+  livePreviewUrl   String?
+  downloadCount    Int               @default(0)
+  published        Boolean           @default(true)
+  sortOrder        Int               @default(0)
+  categoryId       String?
+  category         DownloadCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([categoryId])
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  title     String?
+  imageUrl  String
+  altText   String?
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, sortOrder])
+}
+
+model BlogCategory {
+  id        String     @id @default(cuid())
+  name      String
+  slug      String     @unique
+  posts     BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model BlogPost {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  excerpt          String?
+  featuredImageUrl String?
+  content          Json
+  published        Boolean       @default(true)
+  publishedAt      DateTime?
+  sortOrder        Int           @default(0)
+  categoryId       String?
+  category         BlogCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([published, publishedAt])
+  @@index([sortOrder])
+  @@index([categoryId])
+}
+
+model PromoBanner {
+  id        String   @id @default(cuid())
+  location  String
+  title     String?
+  imageUrl  String
+  targetUrl String
+  published Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([location, published, sortOrder])
 }

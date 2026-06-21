@@ -5,7 +5,7 @@ export const uploadFilenamePattern = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,180}\.(?:webp
 export function uploadRoot() {
   return process.env.UPLOAD_DIR
     ? path.resolve(process.env.UPLOAD_DIR)
-    : path.join(process.cwd(), "public", "uploads")
+    : path.join(process.cwd(), "storage", "uploads")
 }
 
 export function safeUploadFilename(filename: string) {

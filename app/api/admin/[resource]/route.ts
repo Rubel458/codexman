@@ -44,7 +44,7 @@ export async function GET(
     orderBy: { createdAt: "desc" },
     take: resource === "activity-logs" ? 300 : 200,
   };
-  if (resource === "portfolios" || resource === "demos")
+  if (resource === "portfolios" || resource === "demos" || resource === "download-items" || resource === "blog-posts")
     findOptions.include = { category: true };
   const items = await (config.delegate() as any).findMany(findOptions);
   return NextResponse.json(

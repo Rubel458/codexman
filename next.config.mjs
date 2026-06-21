@@ -49,6 +49,11 @@ const nextConfig = {
       { source: "/portfolio/:path*", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
       { source: "/demo", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
       { source: "/contact-us", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
+      { source: "/downloads", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
+      { source: "/gallery", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
+      { source: "/blog", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
+      { source: "/blog/:path*", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
+      { source: "/api/downloads/:path*", headers: [{ key: "Cache-Control", value: "private, max-age=0, no-store" }] },
       { source: "/pages/:path*", headers: [{ key: "Cache-Control", value: "no-store, max-age=0, must-revalidate" }] },
     ]
   },

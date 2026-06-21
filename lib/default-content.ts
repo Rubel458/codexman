@@ -68,5 +68,9 @@ export const defaultMenuItems = [
   { key: "services", label: "Services", href: "/services", sortOrder: 30 },
   ...defaultServices.map((service, index) => ({ key: `service-${service.slug}`, parentKey: "services", label: service.title, href: `/services/${service.slug}`, sortOrder: (index + 1) * 10 })),
   { key: "demo", label: "Demo", href: "/demo", sortOrder: 40 },
+  { key: "portfolio", label: "Portfolio", href: "/portfolio", sortOrder: 45 },
+  { key: "free-downloads", label: "Free Downloads", href: "/downloads", sortOrder: 46 },
+  { key: "gallery", label: "Gallery", href: "/gallery", sortOrder: 47 },
+  { key: "blog", label: "Blog", href: "/blog", sortOrder: 48 },
   { key: "contact-us", label: "Contact Us", href: "/contact-us", sortOrder: 50 },
 ]

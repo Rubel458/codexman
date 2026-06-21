@@ -6,6 +6,7 @@ import { sendPasswordReset } from "@/lib/email"
 import { clientFingerprint, enforceRateLimit } from "@/lib/rate-limit"
 import { readJsonBody } from "@/lib/security"
 import { prisma } from "@/lib/prisma"
+import { getSiteUrl } from "@/lib/site-url"
 
 const schema = z.object({ email: z.string().email().max(160).transform(value => value.toLowerCase().trim()) })
 
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
     const token = randomBytes(32).toString("hex")
     await prisma.passwordResetToken.updateMany({ where: { adminId: admin.id, usedAt: null }, data: { usedAt: new Date() } })
     await prisma.passwordResetToken.create({ data: { tokenHash: createHash("sha256").update(token).digest("hex"), expiresAt: new Date(Date.now() + 30 * 60 * 1000), adminId: admin.id } })
-    const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+    const base = getSiteUrl()
     await sendPasswordReset(admin.email, `${base}/admin/reset-password?token=${token}`)
   }
   return NextResponse.json({ ok: true })

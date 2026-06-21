@@ -1,6 +1,13 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, RefreshCw, Send, Trash2, Upload, X } from "lucide-react";
 import { getCsrf } from "@/components/admin/csrf";
@@ -17,7 +24,8 @@ type FieldType =
   | "counters"
   | "select"
   | "image"
-  | "images";
+  | "images"
+  | "file";
 type SelectOption = string | { value: string; label: string };
 type Field = {
   path: string;
@@ -27,6 +35,11 @@ type Field = {
   help?: string;
   required?: boolean;
   options?: SelectOption[];
+  filePaths?: {
+    originalFilename: string;
+    fileSizeBytes: string;
+    fileMimeType: string;
+  };
 };
 type ResourceDefinition = {
   description: string;
@@ -374,6 +387,184 @@ const definitions: Record<string, ResourceDefinition> = {
     ],
     sample: { name: "Business Websites", slug: "business-websites" },
   },
+  "download-items": {
+    description: "Manage public resources visitors can download without login.",
+    fields: [
+      {
+        path: "slug",
+        label: "Slug",
+        required: true,
+        placeholder: "free-wordpress-plugin",
+      },
+      { path: "title", label: "Download title", required: true },
+      { path: "description", label: "Short description", type: "textarea" },
+      {
+        path: "additionalInfo",
+        label: "Additional information",
+        type: "textarea",
+        help: "Shown on the dedicated download details page.",
+      },
+      { path: "thumbnailUrl", label: "Thumbnail image", type: "image" },
+      {
+        path: "fileName",
+        label: "Download file",
+        type: "file",
+        required: true,
+        help: "Allowed: ZIP, PDF, TXT, CSV, JSON, PNG, JPG and WebP. The public button will download this file immediately.",
+        filePaths: {
+          originalFilename: "originalFilename",
+          fileSizeBytes: "fileSizeBytes",
+          fileMimeType: "fileMimeType",
+        },
+      },
+      { path: "livePreviewUrl", label: "Live preview URL" },
+      {
+        path: "categoryId",
+        label: "Download category",
+        type: "select",
+        help: "Choose the category shown on the Downloads page.",
+      },
+      { path: "downloadCount", label: "Download count", type: "number" },
+      { path: "sortOrder", label: "Sort order", type: "number" },
+      { path: "published", label: "Active / Published", type: "checkbox" },
+    ],
+    sample: {
+      slug: "free-resource",
+      title: "Free Resource",
+      description: "Short description for visitors.",
+      thumbnailUrl: "/placeholder.jpg",
+      fileName: "",
+      originalFilename: "",
+      fileMimeType: "application/zip",
+      fileSizeBytes: 0,
+      livePreviewUrl: null,
+      downloadCount: 0,
+      published: true,
+      sortOrder: 10,
+    },
+  },
+  "download-categories": {
+    description: "Categories used to organize free downloads.",
+    fields: [
+      { path: "name", label: "Category name", required: true },
+      { path: "slug", label: "Slug", required: true },
+    ],
+    sample: { name: "New Category", slug: "new-category" },
+  },
+  "gallery-items": {
+    description: "Manage the public gallery grid and lightbox images.",
+    fields: [
+      { path: "title", label: "Image title" },
+      {
+        path: "imageUrl",
+        label: "Gallery image",
+        type: "image",
+        required: true,
+      },
+      { path: "altText", label: "Alt text" },
+      { path: "sortOrder", label: "Sort order", type: "number" },
+      { path: "published", label: "Active / Published", type: "checkbox" },
+    ],
+    sample: {
+      title: "Gallery image",
+      imageUrl: "/placeholder.jpg",
+      altText: "Gallery image",
+      sortOrder: 10,
+      published: true,
+    },
+  },
+  "blog-posts": {
+    description:
+      "Manage blog posts. Posts appear only on the Blog page, never on the homepage.",
+    fields: [
+      {
+        path: "slug",
+        label: "Slug",
+        required: true,
+        placeholder: "blog-post-title",
+      },
+      { path: "title", label: "Post title", required: true },
+      { path: "excerpt", label: "Short excerpt", type: "textarea" },
+      { path: "featuredImageUrl", label: "Featured image", type: "image" },
+      {
+        path: "content.body",
+        label: "Full content",
+        type: "textarea",
+        required: true,
+      },
+      {
+        path: "categoryId",
+        label: "Blog category",
+        type: "select",
+        help: "Optional category shown in the blog sidebar.",
+      },
+      {
+        path: "publishedAt",
+        label: "Publish date",
+        placeholder: "2026-06-21T10:00:00.000Z",
+      },
+      { path: "sortOrder", label: "Sort order", type: "number" },
+      { path: "published", label: "Active / Published", type: "checkbox" },
+    ],
+    sample: {
+      slug: "new-blog-post",
+      title: "New Blog Post",
+      excerpt: "Short summary",
+      featuredImageUrl: "/placeholder.jpg",
+      content: { body: "Write the full blog content here." },
+      categoryId: null,
+      publishedAt: new Date().toISOString(),
+      sortOrder: 10,
+      published: true,
+    },
+  },
+  "blog-categories": {
+    description: "Categories used to organize blog posts.",
+    fields: [
+      { path: "name", label: "Category name", required: true },
+      { path: "slug", label: "Slug", required: true },
+    ],
+    sample: { name: "New Blog Category", slug: "new-blog-category" },
+  },
+  "promo-banners": {
+    description:
+      "Manage sidebar promotional banners for Downloads and Blog details pages.",
+    fields: [
+      {
+        path: "location",
+        label: "Banner location",
+        type: "select",
+        required: true,
+        options: [
+          { value: "download_sidebar", label: "Download details sidebar" },
+          { value: "blog_sidebar", label: "Blog details sidebar" },
+        ],
+      },
+      { path: "title", label: "Internal title" },
+      {
+        path: "imageUrl",
+        label: "Banner image",
+        type: "image",
+        required: true,
+      },
+      {
+        path: "targetUrl",
+        label: "Clickable target URL",
+        required: true,
+        help: "Example: /services, /portfolio or https://example.com",
+      },
+      { path: "sortOrder", label: "Sort order", type: "number" },
+      { path: "published", label: "Active / Published", type: "checkbox" },
+    ],
+    sample: {
+      location: "download_sidebar",
+      title: "Sidebar promotion",
+      imageUrl: "/placeholder.jpg",
+      targetUrl: "/contact-us",
+      sortOrder: 10,
+      published: true,
+    },
+  },
   testimonials: {
     description:
       "Manage the complete client review cards displayed on the homepage.",
@@ -600,7 +791,11 @@ function itemDetails(item: Item) {
     .map(String)
     .join(" · ");
 }
-function relationOptions(items: Item[], emptyLabel: string, emptyStateLabel: string): SelectOption[] {
+function relationOptions(
+  items: Item[],
+  emptyLabel: string,
+  emptyStateLabel: string,
+): SelectOption[] {
   if (!items.length) return [{ value: "", label: emptyStateLabel }];
   return [
     { value: "", label: emptyLabel },
@@ -627,6 +822,8 @@ export function ResourceManager({
   const [items, setItems] = useState<Item[]>([]);
   const [portfolioCategories, setPortfolioCategories] = useState<Item[]>([]);
   const [demoCategories, setDemoCategories] = useState<Item[]>([]);
+  const [downloadCategories, setDownloadCategories] = useState<Item[]>([]);
+  const [blogCategories, setBlogCategories] = useState<Item[]>([]);
   const [relationMessage, setRelationMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Item | null>(null);
@@ -664,9 +861,38 @@ export function ResourceManager({
             ),
           };
         }
+        if (resource === "download-items" && field.path === "categoryId") {
+          return {
+            ...field,
+            type: "select" as FieldType,
+            options: relationOptions(
+              downloadCategories,
+              "Uncategorized / No category",
+              "No download categories loaded yet",
+            ),
+          };
+        }
+        if (resource === "blog-posts" && field.path === "categoryId") {
+          return {
+            ...field,
+            type: "select" as FieldType,
+            options: relationOptions(
+              blogCategories,
+              "Uncategorized / No category",
+              "No blog categories loaded yet",
+            ),
+          };
+        }
         return field;
       }),
-    [definition.fields, resource, portfolioCategories, demoCategories],
+    [
+      definition.fields,
+      resource,
+      portfolioCategories,
+      demoCategories,
+      downloadCategories,
+      blogCategories,
+    ],
   );
 
   async function reload() {
@@ -688,28 +914,57 @@ export function ResourceManager({
       headers: { accept: "application/json" },
     });
     const json = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(String(json.error || `Unable to load ${path}`));
+    if (!response.ok)
+      throw new Error(String(json.error || `Unable to load ${path}`));
     return Array.isArray(json.items) ? (json.items as Item[]) : [];
   }
   async function loadCategoryOptions() {
     try {
       setRelationMessage("");
       if (resource === "portfolios") {
-        const items = await fetchRelationItems("/api/admin/portfolio-categories");
+        const items = await fetchRelationItems(
+          "/api/admin/portfolio-categories",
+        );
         setPortfolioCategories(items);
         if (!items.length)
-          setRelationMessage("No portfolio categories found. Create at least one category in Portfolio Categories, then refresh this page.");
+          setRelationMessage(
+            "No portfolio categories found. Create at least one category in Portfolio Categories, then refresh this page.",
+          );
       }
       if (resource === "demos") {
         const items = await fetchRelationItems("/api/admin/demo-categories");
         setDemoCategories(items);
         if (!items.length)
-          setRelationMessage("No demo categories found. Create at least one category in Demo Categories, then refresh this page.");
+          setRelationMessage(
+            "No demo categories found. Create at least one category in Demo Categories, then refresh this page.",
+          );
+      }
+      if (resource === "download-items") {
+        const items = await fetchRelationItems(
+          "/api/admin/download-categories",
+        );
+        setDownloadCategories(items);
+        if (!items.length)
+          setRelationMessage(
+            "No download categories found. Create at least one category in Downloads > Categories, then refresh this page.",
+          );
+      }
+      if (resource === "blog-posts") {
+        const items = await fetchRelationItems("/api/admin/blog-categories");
+        setBlogCategories(items);
+        if (!items.length)
+          setRelationMessage(
+            "No blog categories found. Create at least one category in Blog > Categories, then refresh this page.",
+          );
       }
     } catch (error) {
-      setRelationMessage(error instanceof Error ? error.message : "Unable to load categories.");
+      setRelationMessage(
+        error instanceof Error ? error.message : "Unable to load categories.",
+      );
       if (resource === "portfolios") setPortfolioCategories([]);
       if (resource === "demos") setDemoCategories([]);
+      if (resource === "download-items") setDownloadCategories([]);
+      if (resource === "blog-posts") setBlogCategories([]);
     }
   }
   useEffect(() => {
@@ -825,14 +1080,18 @@ export function ResourceManager({
       {message && (
         <p className="mt-4 text-sm font-semibold text-blue-700">{message}</p>
       )}
-      {relationMessage && (resource === "portfolios" || resource === "demos") && (
-        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
-          {relationMessage}
-        </p>
-      )}
+      {relationMessage &&
+        (resource === "portfolios" ||
+          resource === "demos" ||
+          resource === "download-items" ||
+          resource === "blog-posts") && (
+          <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+            {relationMessage}
+          </p>
+        )}
       <div className="mt-7 grid gap-3">
         {loading ? (
-                <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">Loading...</p>
         ) : items.length ? (
           items.map((item) => (
             <article
@@ -922,7 +1181,7 @@ function Editor({
 }: {
   fields: Field[];
   draft: Record<string, unknown>;
-  setDraft: (v: Record<string, unknown>) => void;
+  setDraft: Dispatch<SetStateAction<Record<string, unknown>>>;
   editing: boolean;
   save: (e: FormEvent) => void;
   close: () => void;
@@ -946,10 +1205,53 @@ function Editor({
     }
     const url = json.item?.url || json.media?.url || json.url;
     if (typeof url === "string" && url) {
-      setDraft(setAt(draft, path, url));
+      setDraft((current) => setAt(current, path, url));
       return url;
     }
     alert("Upload completed, but no file URL was returned.");
+  }
+  async function uploadDownloadFile(field: Field, file?: File) {
+    if (!file) return;
+    const csrf = await getCsrf();
+    const form = new FormData();
+    form.append("file", file);
+    const response = await fetch("/api/admin/download-files/upload", {
+      method: "POST",
+      headers: { "x-csrf-token": csrf },
+      body: form,
+    });
+    const json = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      alert(json.error || "File upload failed");
+      return;
+    }
+    const uploaded = json.file;
+    if (uploaded?.fileName) {
+      setDraft((current) => {
+        let next = setAt(current, field.path, uploaded.fileName);
+        if (field.filePaths?.originalFilename)
+          next = setAt(
+            next,
+            field.filePaths.originalFilename,
+            uploaded.originalFilename || "",
+          );
+        if (field.filePaths?.fileSizeBytes)
+          next = setAt(
+            next,
+            field.filePaths.fileSizeBytes,
+            Number(uploaded.fileSizeBytes || 0),
+          );
+        if (field.filePaths?.fileMimeType)
+          next = setAt(
+            next,
+            field.filePaths.fileMimeType,
+            uploaded.fileMimeType || "application/octet-stream",
+          );
+        return next;
+      });
+      return uploaded.fileName as string;
+    }
+    alert("Upload completed, but no file name was returned.");
   }
   return (
     <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/70 p-4">
@@ -983,6 +1285,7 @@ function Editor({
               value={getAt(draft, field.path)}
               change={(next) => setDraft(setAt(draft, field.path, next))}
               upload={upload}
+              uploadDownloadFile={uploadDownloadFile}
             />
           ))}
         </div>
@@ -1008,15 +1311,26 @@ function FieldControl({
   value,
   change,
   upload,
+  uploadDownloadFile,
 }: {
   field: Field;
   value: unknown;
   change: (value: unknown) => void;
   upload: (path: string, file?: File) => Promise<string | undefined>;
+  uploadDownloadFile: (
+    field: Field,
+    file?: File,
+  ) => Promise<string | undefined>;
 }) {
-  const wide = ["textarea", "lines", "pairs", "counters", "image", "images"].includes(
-    field.type || "text",
-  );
+  const wide = [
+    "textarea",
+    "lines",
+    "pairs",
+    "counters",
+    "image",
+    "images",
+    "file",
+  ].includes(field.type || "text");
   if (field.type === "checkbox")
     return (
       <label className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold">
@@ -1056,6 +1370,13 @@ function FieldControl({
           value={value}
           change={change}
           upload={upload}
+          className={common}
+        />
+      ) : field.type === "file" ? (
+        <FileUpload
+          field={field}
+          value={value}
+          uploadDownloadFile={uploadDownloadFile}
           className={common}
         />
       ) : field.type === "select" ? (
@@ -1111,6 +1432,57 @@ function FieldControl({
   );
 }
 
+function FileUpload({
+  field,
+  value,
+  uploadDownloadFile,
+  className,
+}: {
+  field: Field;
+  value: unknown;
+  uploadDownloadFile: (
+    field: Field,
+    file?: File,
+  ) => Promise<string | undefined>;
+  className: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  async function add(file?: File) {
+    if (!file) return;
+    setUploading(true);
+    try {
+      await uploadDownloadFile(field, file);
+    } finally {
+      setUploading(false);
+    }
+  }
+  return (
+    <div className="grid gap-3">
+      <input
+        value={textValue(field, value)}
+        readOnly
+        required={field.required}
+        placeholder="Upload a file to fill this field"
+        className={className}
+      />
+      <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-xs font-bold text-blue-700 transition hover:bg-blue-100">
+        <Upload className="size-4" />
+        {uploading ? "Uploading..." : "Upload File"}
+        <input
+          type="file"
+          accept=".zip,.pdf,.txt,.csv,.json,image/png,image/jpeg,image/webp"
+          className="hidden"
+          disabled={uploading}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            void add(file);
+            event.currentTarget.value = "";
+          }}
+        />
+      </label>
+    </div>
+  );
+}
 
 function arrayValue(value: unknown): string[] {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : [];
@@ -1188,7 +1560,8 @@ function MultiImageUpload({
         </div>
       ) : (
         <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4 text-xs font-normal text-muted-foreground">
-          No screenshots uploaded yet. Click Add Screenshot to upload the first image.
+          No screenshots uploaded yet. Click Add Screenshot to upload the first
+          image.
         </p>
       )}
       <label className="inline-flex w-fit cursor-pointer items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-xs font-bold text-blue-700 transition hover:bg-blue-100">

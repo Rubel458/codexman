@@ -3,9 +3,10 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { VisitorTracker } from "@/components/visitor-tracker"
 import { CmsRefreshListener } from "@/components/cms-refresh-listener"
+import { getSiteUrl } from "@/lib/site-url"
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
+  metadataBase: new URL(getSiteUrl()),
   title: { default: "IT Lab BD - Web Development & IT Solutions", template: "%s | IT Lab BD" },
   description: "IT Lab BD builds fast, secure and SEO-friendly business websites, e-commerce platforms and custom web solutions for clients worldwide.",
   icons: { icon: "/icon.svg", apple: "/apple-icon.png" },

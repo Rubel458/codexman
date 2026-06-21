@@ -8,6 +8,7 @@ import { clientFingerprint, enforceRateLimit } from "@/lib/rate-limit"
 import { idSchema, isTrustedOrigin, readJsonBody } from "@/lib/security"
 import { validateAdminPayload } from "@/lib/admin-validation"
 import { deleteMediaWithFiles } from "@/lib/media-storage"
+import { deleteDownloadItemWithFile } from "@/lib/download-storage"
 
 function errorResponse(error: unknown) {
   if (error instanceof Error && error.message === "PAYLOAD_TOO_LARGE") return NextResponse.json({ error: "Request payload is too large." }, { status: 413 })
@@ -50,6 +51,7 @@ export async function DELETE(request: Request, context: { params: Promise<{ reso
   if (!config) return NextResponse.json({ error: "Unknown resource" }, { status: 404 })
   if (config.readOnly || resource === "leads") return NextResponse.json({ error: "This resource cannot be deleted here." }, { status: 405 })
   if (resource === "media") await deleteMediaWithFiles(id)
+  else if (resource === "download-items") await deleteDownloadItemWithFile(id)
   else await (config.delegate() as any).delete({ where: { id } })
   const invalidation = await invalidateCmsCache(`delete:${resource}:${id}`)
   await logActivity({ request, adminId: auth.sub, username: auth.username, action: "CMS_DELETE", resource, resourceId: id })

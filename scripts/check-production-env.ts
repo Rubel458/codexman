@@ -11,6 +11,7 @@ const sessionSecret = required("SESSION_SECRET")
 const analyticsSecret = required("ANALYTICS_HASH_SECRET")
 const siteUrl = required("NEXT_PUBLIC_SITE_URL")
 const uploadDir = required("UPLOAD_DIR")
+const downloadDir = required("DOWNLOAD_DIR")
 const backupDir = required("BACKUP_DIR")
 
 for (const [key, value] of [["DATABASE_URL", databaseUrl], ["SESSION_SECRET", sessionSecret], ["ANALYTICS_HASH_SECRET", analyticsSecret], ["NEXT_PUBLIC_SITE_URL", siteUrl]] as const) rejectPlaceholder(key, value)
@@ -19,6 +20,7 @@ if (analyticsSecret.length < 32) errors.push("ANALYTICS_HASH_SECRET must contain
 try { const parsed = new URL(databaseUrl); if (!["postgresql:", "postgres:"].includes(parsed.protocol)) errors.push("DATABASE_URL must use PostgreSQL") } catch { errors.push("DATABASE_URL is not a valid URL") }
 try { const parsed = new URL(siteUrl); if (parsed.protocol !== "https:") errors.push("NEXT_PUBLIC_SITE_URL must use HTTPS in production") } catch { errors.push("NEXT_PUBLIC_SITE_URL is not a valid URL") }
 if (!path.isAbsolute(uploadDir)) errors.push("UPLOAD_DIR must be an absolute VPS path")
+if (!path.isAbsolute(downloadDir)) errors.push("DOWNLOAD_DIR must be an absolute VPS path")
 if (!path.isAbsolute(backupDir)) errors.push("BACKUP_DIR must be an absolute VPS path")
 if (env.ALLOW_ENV_AUTH_FALLBACK === "true") errors.push("ALLOW_ENV_AUTH_FALLBACK must remain false in production")
 if (env.TRUST_PROXY_HEADERS !== "true") errors.push("TRUST_PROXY_HEADERS must be true behind the included Nginx proxy")
