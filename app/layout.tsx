@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { VisitorTracker } from "@/components/visitor-tracker"
 import { CmsRefreshListener } from "@/components/cms-refresh-listener"
+import { ScrollRevealInit } from "@/components/scroll-reveal-init"
 import { getSiteUrl } from "@/lib/site-url"
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         {children}
         <VisitorTracker />
         <CmsRefreshListener />
+        <ScrollRevealInit />
         {process.env.NODE_ENV === "production" && <Analytics />}
       </body>
     </html>

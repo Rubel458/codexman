@@ -162,6 +162,7 @@ const groups: AdminNavGroup[] = [
       { label: "Floating Contact", href: "/admin/contact-widget", icon: MessageCircle },
       { label: "Advanced Settings", href: "/admin/settings", icon: Settings },
       { label: "Header Menus", href: "/admin/menus", icon: LayoutTemplate },
+      { label: "Footer Settings", href: "/admin/footer-settings", icon: LayoutTemplate },
       { label: "Sidebar Banners", href: "/admin/promo-banners", icon: Image },
     ],
   },

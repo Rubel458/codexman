@@ -467,6 +467,18 @@ export async function getSiteSettings() {
     email: "info@itlabbd.com",
     address: "South Banasree Project, Khilgaon, Dhaka",
     topbar_message: "Howdy, ITLABBD",
+    header_info_text: "Have Any Questions?",
+    header_button_text: "DEMOS",
+    header_button_url: "/demo",
+    header_icon_1_name: "twitter",
+    header_icon_1_text: "Twitter/X",
+    header_icon_1_url: "#",
+    header_icon_2_name: "facebook",
+    header_icon_2_text: "Facebook",
+    header_icon_2_url: "#",
+    header_icon_3_name: "linkedin",
+    header_icon_3_text: "LinkedIn",
+    header_icon_3_url: "#",
     twitter_url: "#",
     facebook_url: "#",
     linkedin_url: "#",
@@ -498,6 +510,10 @@ export async function getSiteSettings() {
     "header_logo_image_url",
     "footer_logo_image_url",
     "logo_image_url",
+    "header_button_url",
+    "header_icon_1_url",
+    "header_icon_2_url",
+    "header_icon_3_url",
     "twitter_url",
     "facebook_url",
     "linkedin_url",
@@ -508,6 +524,12 @@ export async function getSiteSettings() {
       settings[key] = fallback[key] || "";
     }
   }
+  if (settings.header_icon_1_url === "#" && settings.twitter_url !== "#")
+    settings.header_icon_1_url = settings.twitter_url;
+  if (settings.header_icon_2_url === "#" && settings.facebook_url !== "#")
+    settings.header_icon_2_url = settings.facebook_url;
+  if (settings.header_icon_3_url === "#" && settings.linkedin_url !== "#")
+    settings.header_icon_3_url = settings.linkedin_url;
   return settings;
 }
 
@@ -565,6 +587,172 @@ export function getContactWidgetSettings() {
     },
     fallback,
   );
+}
+
+
+
+export type FooterLink = {
+  label: string;
+  href: string;
+  enabled: boolean;
+};
+
+export type FooterSocialLink = {
+  platform: string;
+  label: string;
+  href: string;
+  enabled: boolean;
+};
+
+export type FooterSettings = {
+  aboutTitle: string;
+  description: string;
+  logoMode: "text" | "image";
+  logoImageUrl: string;
+  quickLinksTitle: string;
+  quickLinks: FooterLink[];
+  resourceLinksTitle: string;
+  resourceLinks: FooterLink[];
+  contactTitle: string;
+  phoneLabel: string;
+  phone: string;
+  emailLabel: string;
+  email: string;
+  addressLabel: string;
+  address: string;
+  copyrightText: string;
+  socialLinks: FooterSocialLink[];
+};
+
+const footerFallback: FooterSettings = {
+  aboutTitle: "About Company",
+  description:
+    "IT Lab BD is a trusted IT solution agency helping businesses launch modern websites, digital products and automation systems.",
+  logoMode: "text",
+  logoImageUrl: "",
+  quickLinksTitle: "Quick Links",
+  quickLinks: [
+    { label: "About us", href: "/about-us", enabled: true },
+    { label: "Services", href: "/services", enabled: true },
+    { label: "Portfolios", href: "/portfolio", enabled: true },
+    { label: "Blogs", href: "/blog", enabled: true },
+    { label: "FAQs", href: "/pages/faqs", enabled: true },
+  ],
+  resourceLinksTitle: "Resources",
+  resourceLinks: [
+    { label: "Request Demo", href: "/demo", enabled: true },
+    { label: "Free Website", href: "/contact-us", enabled: true },
+    { label: "Free Templates", href: "/downloads", enabled: true },
+    { label: "Free Downloads", href: "/downloads", enabled: true },
+  ],
+  contactTitle: "Contact Us",
+  phoneLabel: "Call Us:",
+  phone: "+8801989897646",
+  emailLabel: "Mail Us:",
+  email: "info@itlabbd.com",
+  addressLabel: "Address",
+  address: "South Banasree Project, Khilgaon, Dhaka",
+  copyrightText: "© 2026 IT Lab. All Rights Reserved.",
+  socialLinks: [
+    { platform: "facebook", label: "Facebook", href: "#", enabled: true },
+    { platform: "linkedin", label: "LinkedIn", href: "#", enabled: true },
+    { platform: "twitter", label: "Twitter/X", href: "#", enabled: true },
+    { platform: "instagram", label: "Instagram", href: "#", enabled: true },
+  ],
+};
+
+function safeLinkList(value: unknown, fallback: FooterLink[]) {
+  const source = Array.isArray(value) ? value : fallback;
+  return source
+    .slice(0, 40)
+    .map((item: any) => {
+      const label = settingString(item?.label, "").slice(0, 80).trim();
+      if (!label) return null;
+      let href = "#";
+      try {
+        href = sanitizeUrl(settingString(item?.href, "#"));
+      } catch {
+        href = "#";
+      }
+      return { label, href, enabled: settingBool(item?.enabled, true) };
+    })
+    .filter(Boolean) as FooterLink[];
+}
+
+function safeSocialList(value: unknown, fallback: FooterSocialLink[]) {
+  const source = Array.isArray(value) ? value : fallback;
+  return source
+    .slice(0, 20)
+    .map((item: any) => {
+      const label = settingString(item?.label, "").slice(0, 80).trim();
+      const platform = settingString(item?.platform, label || "link").slice(0, 40).trim().toLowerCase();
+      if (!label) return null;
+      let href = "#";
+      try {
+        href = sanitizeUrl(settingString(item?.href, "#"));
+      } catch {
+        href = "#";
+      }
+      return { platform, label, href, enabled: settingBool(item?.enabled, true) };
+    })
+    .filter(Boolean) as FooterSocialLink[];
+}
+
+export async function getFooterSettings() {
+  const siteSettings = await getSiteSettings();
+  const fallback: FooterSettings = {
+    ...footerFallback,
+    logoMode: (siteSettings.footer_logo_mode === "image" ? "image" : "text") as "text" | "image",
+    logoImageUrl: siteSettings.footer_logo_image_url || siteSettings.logo_image_url || "",
+    phone: siteSettings.phone || footerFallback.phone,
+    email: siteSettings.email || footerFallback.email,
+    address: siteSettings.address || footerFallback.address,
+    socialLinks: footerFallback.socialLinks.map((social) => ({
+      ...social,
+      href:
+        social.platform === "facebook"
+          ? siteSettings.facebook_url || social.href
+          : social.platform === "linkedin"
+            ? siteSettings.linkedin_url || social.href
+            : social.platform === "twitter"
+              ? siteSettings.twitter_url || social.href
+              : social.href,
+    })),
+  };
+  const rows = await cached(
+    "cms:footer-settings",
+    async () => prisma.settings.findMany({ where: { group: "footer" } }),
+    [] as Array<{ key: string; value: unknown }>,
+  );
+  const byKey = new Map((rows as Array<{ key: string; value: unknown }>).map((row) => [row.key, row.value]));
+  const footer: FooterSettings = {
+    ...fallback,
+    aboutTitle: settingString(byKey.get("footer_about_title"), fallback.aboutTitle),
+    description: settingString(byKey.get("footer_description"), fallback.description),
+    logoMode: settingString(byKey.get("footer_logo_mode"), fallback.logoMode) === "image" ? "image" : "text",
+    logoImageUrl: settingString(byKey.get("footer_logo_image_url"), fallback.logoImageUrl),
+    quickLinksTitle: settingString(byKey.get("footer_quick_links_title"), fallback.quickLinksTitle),
+    quickLinks: safeLinkList(byKey.get("footer_quick_links"), fallback.quickLinks),
+    resourceLinksTitle: settingString(byKey.get("footer_resource_links_title"), fallback.resourceLinksTitle),
+    resourceLinks: safeLinkList(byKey.get("footer_resource_links"), fallback.resourceLinks),
+    contactTitle: settingString(byKey.get("footer_contact_title"), fallback.contactTitle),
+    phoneLabel: settingString(byKey.get("footer_phone_label"), fallback.phoneLabel),
+    phone: settingString(byKey.get("footer_phone"), fallback.phone),
+    emailLabel: settingString(byKey.get("footer_email_label"), fallback.emailLabel),
+    email: settingString(byKey.get("footer_email"), fallback.email),
+    addressLabel: settingString(byKey.get("footer_address_label"), fallback.addressLabel),
+    address: settingString(byKey.get("footer_address"), fallback.address),
+    copyrightText: settingString(byKey.get("footer_copyright_text"), fallback.copyrightText),
+    socialLinks: safeSocialList(byKey.get("footer_social_links"), fallback.socialLinks),
+  };
+  for (const key of ["logoImageUrl"] as const) {
+    try {
+      footer[key] = sanitizeUrl(footer[key] || "");
+    } catch {
+      footer[key] = fallback[key] || "";
+    }
+  }
+  return footer;
 }
 
 export function getPageContent(slug: string) {
