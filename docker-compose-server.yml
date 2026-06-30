@@ -15,7 +15,7 @@ services:
       REDIS_URL: redis://redis:6379
 
       ADMIN_USERNAME: admin
-      ADMIN_PASSWORD_HASH: '$2b$12$V3MpgnhhELgdPYLC/qQ2Y.30uyqrdZDR/nvRrLP6eB2v7/PujfKGu'
+      ADMIN_PASSWORD_HASH: '$$2b$$12$$FvljCE.w/oxKa.sOzo9.g.kasdSWsuNmx.tSlPW67H5n5iNWvUCUG'
       ALLOW_ENV_AUTH_FALLBACK: "true"
       SESSION_SECRET: Q8x7M2nK9pL4vR6tY1wZ5cA8eD3fG7hJ2mN9pQ4rT6uV8xY3zB5cD7eF
 
