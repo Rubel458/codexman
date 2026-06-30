@@ -17,6 +17,7 @@ services:
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD_HASH: '$$2b$$12$$FvljCE.w/oxKa.sOzo9.g.kasdSWsuNmx.tSlPW67H5n5iNWvUCUG'
       ALLOW_ENV_AUTH_FALLBACK: "true"
+      ADMIN_FORCE_PASSWORD_SYNC: "true"
       SESSION_SECRET: Q8x7M2nK9pL4vR6tY1wZ5cA8eD3fG7hJ2mN9pQ4rT6uV8xY3zB5cD7eF
 
   postgres:
