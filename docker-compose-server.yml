@@ -11,14 +11,34 @@ services:
 
     environment:
       NODE_ENV: production
+
       DATABASE_URL: postgresql://codexman:StrongPassword123@postgres:5432/codexman?schema=public
       REDIS_URL: redis://redis:6379
 
       ADMIN_USERNAME: admin
-      ADMIN_PASSWORD_HASH: '$$2b$$12$$FvljCE.w/oxKa.sOzo9.g.kasdSWsuNmx.tSlPW67H5n5iNWvUCUG'
-      ALLOW_ENV_AUTH_FALLBACK: "true"
-      ADMIN_FORCE_PASSWORD_SYNC: "true"
+      ALLOW_ENV_AUTH_FALLBACK: "false"
+      ADMIN_FORCE_PASSWORD_SYNC: "false"
+
       SESSION_SECRET: Q8x7M2nK9pL4vR6tY1wZ5cA8eD3fG7hJ2mN9pQ4rT6uV8xY3zB5cD7eF
+      ANALYTICS_HASH_SECRET: Q7mX9kLp3vR8sT2wY6zA1cD4eF5gH7jK9nP2qR6u
+
+      NEXT_PUBLIC_SITE_URL: https://dev.codexman.com
+      SITE_URL: https://dev.codexman.com
+
+      PG_DUMP_PATH: /usr/bin/pg_dump
+      PG_RESTORE_PATH: /usr/bin/pg_restore
+      BACKUP_DIR: /app/storage/backups
+
+      CMS_QUERY_TIMEOUT_MS: "4000"
+      CMS_SEO_QUERY_TIMEOUT_MS: "1200"
+      CMS_CACHE_TTL_SECONDS: "60"
+      CMS_FALLBACK_CACHE_TTL_SECONDS: "15"
+      CMS_DEBUG_TIMING: "false"
+
+    volumes:
+      - itlabbd_uploads:/app/storage/uploads
+      - itlabbd_downloads:/app/storage/downloads
+      - itlabbd_backups:/app/storage/backups
 
   postgres:
     image: postgres:16
@@ -42,3 +62,6 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  itlabbd_uploads:
+  itlabbd_downloads:
+  itlabbd_backups:
